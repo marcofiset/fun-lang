@@ -21,13 +21,13 @@ class Parser
     {
         $left = $this->parseNumberNode();
 
-//        if ($this->isEmpty())
+        if ($this->isEmpty())
             return new ExpressionNode($left);
 
-//        $operatorToken = $this->expectTokenType(TokenType::Operator);
-//        $right = $this->parseNumberNode();
-//
-//        return new ExpressionNode($left, $operatorToken->getValue(), $right);
+        $operatorToken = $this->expectTokenType(TokenType::Operator);
+        $right = $this->parseNumberNode();
+
+        return new ExpressionNode($left, $operatorToken->getValue(), $right);
     }
 
     private function parseNumberNode()
@@ -55,8 +55,8 @@ class Parser
         return array_shift($this->tokens);
     }
 
-//    private function isEmpty()
-//    {
-//        return count($this->tokens) === 0;
-//    }
+    private function isEmpty()
+    {
+        return count($this->tokens) === 0;
+    }
 }
