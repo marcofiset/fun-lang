@@ -18,10 +18,6 @@ $lexer->add(new TokenDefinition('/[+\-*\/]/', TokenType::Operator));
 
 $tokens = $lexer->tokenize($fileContent);
 
-$tokens = array_filter($tokens, function(Token $t) {
-    return $t->getType() !== TokenType::Whitespace;
-});
-
 $parser = new Parser();
 $tree = $parser->parse($tokens);
 

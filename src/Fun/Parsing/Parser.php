@@ -10,11 +10,19 @@ class Parser
 {
     private $tokens;
 
-    public function parse($tokens)
+    public function parse(array $tokens)
     {
+        $tokens = $this->filterTokens($tokens);
         $this->tokens = $tokens;
 
         return $this->parseExpressionNode();
+    }
+
+    private function filterTokens(array $tokens)
+    {
+        return array_filter($tokens, function(Token $t) {
+            return $t->getType() !== TokenType::Whitespace;
+        });
     }
 
     private function parseExpressionNode()
@@ -44,9 +52,6 @@ class Parser
      */
     private function expectTokenType($tokenType)
     {
-//        if ($this->isEmpty())
-//            throw new Exception('Expected a token, but stream is empty.');
-
         $peek = $this->tokens[0];
 
         if ($peek->getType() !== $tokenType)
