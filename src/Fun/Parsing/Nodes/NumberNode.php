@@ -1,6 +1,8 @@
 <?php namespace Fun\Parsing\Nodes;
 
-class NumberNode
+use Fun\Interpreting\Visitors\Visitor;
+
+class NumberNode extends Node
 {
     private $value;
 
@@ -15,5 +17,10 @@ class NumberNode
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function accept(Visitor $visitor)
+    {
+        return $visitor->visitNumberNode($this);
     }
 }

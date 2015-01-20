@@ -1,6 +1,8 @@
 <?php namespace Fun\Parsing\Nodes;
 
-class ExpressionNode
+use Fun\Interpreting\Visitors\Visitor;
+
+class ExpressionNode extends Node
 {
     private $left;
     private $operator;
@@ -37,5 +39,10 @@ class ExpressionNode
     public function getRight()
     {
         return $this->right;
+    }
+
+    public function accept(Visitor $visitor)
+    {
+        return $visitor->visitExpressionNode($this);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
+use Fun\Interpreting\Interpreter;
 use Fun\Lexing\Lexer;
-use Fun\Lexing\Token;
 use Fun\Lexing\TokenDefinition;
 use Fun\Lexing\TokenType;
 use Fun\Parsing\Parser;
@@ -19,6 +19,9 @@ $lexer->add(new TokenDefinition('/[+\-*\/]/', TokenType::Operator));
 $tokens = $lexer->tokenize($fileContent);
 
 $parser = new Parser();
-$tree = $parser->parse($tokens);
+$rootNode = $parser->parse($tokens);
 
-var_dump($tree);
+$interpreter = new Interpreter();
+$result = $rootNode->accept($interpreter);
+
+var_dump($result);
