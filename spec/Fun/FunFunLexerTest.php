@@ -1,21 +1,20 @@
 <?php
 
-use Fun\Lexing\Lexer;
-use Fun\Lexing\TokenDefinition;
-use Fun\Lexing\TokenType;
+use Fun\Lexing\FunLexer;
 use Fun\Lexing\Token;
+use Fun\Lexing\TokenType;
 use Fun\Lexing\UnknownTokenException;
 
-class LexerTest extends PHPUnit_Framework_TestCase
+class FunLexerTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @var FunLexer
+     */
     private $lexer;
 
     public function setUp()
     {
-        $lexer = new Lexer();
-
-        $lexer->add(new TokenDefinition('/\d+/', TokenType::Number));
-        $lexer->add(new TokenDefinition('/\+/', TokenType::Operator));
+        $lexer = new FunLexer();
 
         $this->lexer = $lexer;
     }
@@ -46,11 +45,36 @@ class LexerTest extends PHPUnit_Framework_TestCase
         $this->assertTokenEquals('5', TokenType::Number, $tokens[2]);
     }
 
+    public function testCanTokenizeWhitespaces()
+    {
+        $tokens = $this->lexer->tokenize('
+
+        ');
+
+        $this->assertEmpty(trim($tokens[0]->getValue()));
+    }
+
+    public function testCanTokenizeIdentifiers()
+    {
+        $tokens = $this->lexer->tokenize('_abc a123 foo');
+
+        $this->assertTokenEquals('_abc', TokenType::Identifier, $tokens[0]);
+        $this->assertTokenEquals('a123', TokenType::Identifier, $tokens[2]);
+        $this->assertTokenEquals('foo', TokenType::Identifier, $tokens[4]);
+    }
+
+    public function testCanTokenizeTerminator()
+    {
+        $tokens = $this->lexer->tokenize(';');
+
+        $this->assertTokenEquals(';', TokenType::Terminator, $tokens[0]);
+    }
+
     public function testExceptionIsThrownOnUnknownToken()
     {
         $this->setExpectedException(UnknownTokenException::class);
 
-        $this->lexer->tokenize('abc');
+        $this->lexer->tokenize('$');
     }
 
     private function assertTokenEquals($value, $type, Token $token)

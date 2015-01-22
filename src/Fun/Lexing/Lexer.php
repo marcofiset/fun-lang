@@ -9,6 +9,11 @@ class Lexer
         $this->tokenDefinitions[] = $tokenDefinition;
     }
 
+    /**
+     * @param $input
+     * @return Token[]
+     * @throws UnknownTokenException
+     */
     public function tokenize($input)
     {
         $tokens = [];
