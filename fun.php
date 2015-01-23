@@ -17,6 +17,6 @@ $parser = new Parser();
 $rootNode = $parser->parse($tokens);
 
 $interpreter = new Interpreter();
-$result = $rootNode->accept($interpreter);
+$result = $interpreter->run($rootNode);
 
 var_dump($result);

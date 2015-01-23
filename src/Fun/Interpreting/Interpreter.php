@@ -17,7 +17,7 @@ class Interpreter implements Visitor
     {
         $this->context = [];
 
-        $rootNode->accept($this);
+        return $rootNode->accept($this);
     }
 
     public function visitExpressionListNode(ExpressionListNode $node)
