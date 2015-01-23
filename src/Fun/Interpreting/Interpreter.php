@@ -3,6 +3,7 @@
 use Exception;
 use Fun\Interpreting\Visitors\Visitor;
 use Fun\Parsing\Nodes\ExpressionListNode;
+use Fun\Parsing\Nodes\Node;
 use Fun\Parsing\Nodes\OperationNode;
 use Fun\Parsing\Nodes\NumberNode;
 use Fun\Parsing\Nodes\VariableAssignmentNode;
@@ -10,6 +11,26 @@ use Fun\Parsing\Nodes\VariableNode;
 
 class Interpreter implements Visitor
 {
+    private $context;
+
+    public function run(Node $rootNode)
+    {
+        $this->context = [];
+
+        $rootNode->accept($this);
+    }
+
+    public function visitExpressionListNode(ExpressionListNode $node)
+    {
+        $result = null;
+
+        foreach ($node->getExpressions() as $expr) {
+            $result = $expr->accept($this);
+        }
+
+        return $result;
+    }
+
     public function visitOperationNode(OperationNode $node)
     {
         $leftValue = $node->getLeft()->accept($this);
@@ -47,18 +68,21 @@ class Interpreter implements Visitor
         return intval($node->getValue());
     }
 
-    function visitExpressionListNode(ExpressionListNode $node)
+    public function visitVariableAssignmentNode(VariableAssignmentNode $node)
     {
-        // TODO: Implement visitExpressionListNode() method.
+        $variableName = $node->getVariableName();
+        $value = $node->getOperation()->accept($this);
+
+        $this->context[$variableName] = $value;
     }
 
-    function visitVariableNode(VariableNode $node)
+    public function visitVariableNode(VariableNode $node)
     {
-        // TODO: Implement visitVariableNode() method.
-    }
+        $variableName = $node->getName();
 
-    function visitVariableAssignmentNode(VariableAssignmentNode $node)
-    {
-        // TODO: Implement visitVariableAssignmentNode() method.
+        if (!array_key_exists($variableName, $this->context))
+            throw new Exception('Undefined variable: ' . $variableName);
+
+        return $this->context[$variableName];
     }
 }
