@@ -3,7 +3,7 @@
 use Exception;
 use Fun\Lexing\Token;
 use Fun\Lexing\TokenType;
-use Fun\Parsing\Nodes\ExpressionNode;
+use Fun\Parsing\Nodes\OperationNode;
 use Fun\Parsing\Nodes\NumberNode;
 
 class Parser
@@ -30,12 +30,12 @@ class Parser
         $left = $this->parseNumberNode();
 
         if ($this->isEmpty())
-            return new ExpressionNode($left);
+            return new OperationNode($left);
 
         $operatorToken = $this->expectTokenType(TokenType::Operator);
         $right = $this->parseNumberNode();
 
-        return new ExpressionNode($left, $operatorToken->getValue(), $right);
+        return new OperationNode($left, $operatorToken->getValue(), $right);
     }
 
     private function parseNumberNode()

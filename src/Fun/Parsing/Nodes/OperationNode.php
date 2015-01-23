@@ -2,23 +2,21 @@
 
 use Fun\Interpreting\Visitors\Visitor;
 
-class ExpressionNode extends Node
+class OperationNode extends Node
 {
     private $left;
     private $operator;
     private $right;
 
-    function __construct(NumberNode $left, $operator = null, NumberNode $right = null)
+    function __construct(Node $left, $operator = null, Node $right = null)
     {
         $this->left = $left;
-
-        // $operator and $right are optional in case we have an expression consisting of a single NumberNode
         $this->operator = $operator;
         $this->right = $right;
     }
 
     /**
-     * @return NumberNode
+     * @return Node
      */
     public function getLeft()
     {
@@ -34,7 +32,7 @@ class ExpressionNode extends Node
     }
 
     /**
-     * @return NumberNode
+     * @return Node
      */
     public function getRight()
     {
@@ -43,6 +41,6 @@ class ExpressionNode extends Node
 
     public function accept(Visitor $visitor)
     {
-        return $visitor->visitExpressionNode($this);
+        return $visitor->visitOperationNode($this);
     }
 }
