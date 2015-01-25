@@ -2,6 +2,7 @@
 
 class Lexer
 {
+    /** @var TokenDefinition[]  */
     private $tokenDefinitions = [];
 
     public function add(TokenDefinition $tokenDefinition)
@@ -16,36 +17,52 @@ class Lexer
      */
     public function tokenize($input)
     {
-        $tokens = [];
-        $currentIndex = 0;
+        $lines = $this->inputToLines($input);
 
-        //The basic loop is to run through the whole input string
-        while ($currentIndex < strlen($input)) {
-            $token = $this->findMatchingToken(substr($input, $currentIndex));
+        $tokenStream = [];
+        $column = 0;
 
-            // If no tokens were matched, it means that the string has invalid tokens
-            // for which we did not define a token definition for
-            if (!$token)
-                throw new UnknownTokenException($currentIndex);
+        foreach ($lines as $lineNumber => $line) {
+            while ($column < strlen($line)) {
+                $token = $this->findMatchingToken(substr($line, $column));
 
-            // Add the matched token to our list of token
-            $tokens[] = $token;
+                if (!$token)
+                    throw new UnknownTokenException($column);
 
-            // Increment the string index by the length of the matched token,
-            // so we can now process the rest of the string.
-            $currentIndex += strlen($token->getValue());
+                $token->setLine($lineNumber + 1);
+                $token->setColumn($column + 1);
+
+                $tokenStream[] = $token;
+                $column += strlen($token->getValue());
+            }
+
+            $column = 0;
         }
 
-        return $tokens;
+        return $tokenStream;
     }
 
+    private function inputToLines($input)
+    {
+        $input = str_replace('\r\n', '\n', $input);
+        $lines = explode("\n", $input);
+
+        return array_map(
+            function($line) {
+                return $line . "\n";
+            }, $lines
+        );
+    }
+
+    /**
+     * @param $input
+     * @return Token
+     */
     private function findMatchingToken($input)
     {
-        // Check with all tokenDefinitions
         foreach ($this->tokenDefinitions as $tokenDefinition) {
             $token = $tokenDefinition->match($input);
 
-            // Return the first token that was matched.
             if ($token)
                 return $token;
         }

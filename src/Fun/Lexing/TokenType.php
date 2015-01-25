@@ -8,4 +8,5 @@ final class TokenType
     const Identifier = 4;
     const AssignmentOperator = 5;
     const Terminator = 6;
+    const NewLine = 7;
 }

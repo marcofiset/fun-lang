@@ -38,8 +38,6 @@ class FunLexerTest extends PHPUnit_Framework_TestCase
     {
         $tokens = $this->lexer->tokenize('3+5');
 
-        $this->assertCount(3, $tokens);
-
         $this->assertTokenEquals('3', TokenType::Number, $tokens[0]);
         $this->assertTokenEquals('+', TokenType::Operator, $tokens[1]);
         $this->assertTokenEquals('5', TokenType::Number, $tokens[2]);
@@ -51,16 +49,18 @@ class FunLexerTest extends PHPUnit_Framework_TestCase
 
         ');
 
-        $this->assertEmpty(trim($tokens[0]->getValue()));
+        $token = $tokens[0];
+        $this->assertEmpty(trim($token->getValue()));
+        $this->assertEquals(TokenType::Whitespace, $token->getType());
     }
 
     public function testCanTokenizeIdentifiers()
     {
-        $tokens = $this->lexer->tokenize('_abc a123 foo');
+        $tokens = $this->lexer->tokenize('_aBc A1_23 foO_');
 
-        $this->assertTokenEquals('_abc', TokenType::Identifier, $tokens[0]);
-        $this->assertTokenEquals('a123', TokenType::Identifier, $tokens[2]);
-        $this->assertTokenEquals('foo', TokenType::Identifier, $tokens[4]);
+        $this->assertTokenEquals('_aBc', TokenType::Identifier, $tokens[0]);
+        $this->assertTokenEquals('A1_23', TokenType::Identifier, $tokens[2]);
+        $this->assertTokenEquals('foO_', TokenType::Identifier, $tokens[4]);
     }
 
     public function testCanTokenizeTerminator()
@@ -77,9 +77,39 @@ class FunLexerTest extends PHPUnit_Framework_TestCase
         $this->lexer->tokenize('$');
     }
 
+    public function testTokensHavePositionInformation()
+    {
+        $tokens = $this->lexer->tokenize('123 456');
+
+        $this->assertTokenPosition($tokens[0], 1, 1);
+        $this->assertTokenPosition($tokens[1], 1, 4);
+        $this->assertTokenPosition($tokens[2], 1, 5);
+    }
+
+    public function testNewLinesArePreservedAsTokens()
+    {
+        $tokens = $this->lexer->tokenize("123\n456");
+
+        $this->assertTokenEquals("\n", TokenType::Whitespace, $tokens[1]);
+    }
+
+    public function testTokensHavePositionInformationMultiLine()
+    {
+        $tokens = $this->lexer->tokenize("123\n456");
+
+        $this->assertTokenPosition($tokens[0], 1, 1);
+        $this->assertTokenPosition($tokens[2], 2, 1);
+    }
+
     private function assertTokenEquals($value, $type, Token $token)
     {
         $this->assertEquals($value, $token->getValue());
         $this->assertEquals($type, $token->getType());
+    }
+
+    private function assertTokenPosition(Token $token, $line, $column)
+    {
+        $this->assertEquals($line, $token->getLine());
+        $this->assertEquals($column, $token->getColumn());
     }
 }
