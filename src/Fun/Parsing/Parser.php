@@ -53,9 +53,8 @@ class Parser
     {
         $nextToken = $this->lookAhead();
 
-        if ($nextToken->getType() === TokenType::AssignmentOperator) {
+        if ($nextToken->getType() === TokenType::AssignmentOperator)
             return $this->parseVariableAssignmentNode();
-        }
 
         return $this->parseOperationNode();
     }
@@ -75,10 +74,10 @@ class Parser
     private function parseOperationNode()
     {
         $left = $this->parseTerm();
+        $token = $this->currentToken();
 
-        if ($this->isEmpty()) {
+        if ($token->getType() === TokenType::Terminator)
             return new OperationNode($left);
-        }
 
         $operatorToken = $this->expectTokenType(TokenType::Operator);
         $right = $this->parseTerm();
@@ -112,9 +111,11 @@ class Parser
     {
         $peek = $this->currentToken();
 
-        if ($peek->getType() !== $tokenType) {
+        if (!$peek)
+            throw new Exception('Unexpected end of stream');
+
+        if ($peek->getType() !== $tokenType)
             throw new Exception('Unexpected token type.');
-        }
 
         return $this->consumeToken();
     }
@@ -139,13 +140,11 @@ class Parser
     /**
      * @param int $position
      * @return Token
-     * @throws Exception
      */
     private function lookAhead($position = 1)
     {
-        if ($position >= count($this->tokens)) {
-            throw new Exception('Tried to look past end of token stream');
-        }
+        if ($position >= count($this->tokens))
+            return null;
 
         return $this->tokens[$position];
     }
