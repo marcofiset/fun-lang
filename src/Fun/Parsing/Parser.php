@@ -11,11 +11,13 @@ use Fun\Parsing\Nodes\VariableNode;
 
 class Parser
 {
-    /**
-     * @Token[]
-     */
+    /** @var  Token[] */
     private $tokens;
 
+    /**
+     * @param Token[] $tokens
+     * @return ExpressionListNode The root node of the parsed AST
+     */
     public function parse(array $tokens)
     {
         $tokens = $this->filterTokens($tokens);
@@ -130,7 +132,6 @@ class Parser
 
     /**
      * @return Token
-     * @throws Exception
      */
     private function currentToken()
     {

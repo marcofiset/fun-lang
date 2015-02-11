@@ -13,6 +13,10 @@ class Interpreter implements Visitor
 {
     private $context;
 
+    /**
+     * @param Node $rootNode The root node of the AST at which to start interpreting
+     * @return mixed The result of the interpretation
+     */
     public function run(Node $rootNode)
     {
         $this->context = [];
@@ -42,6 +46,11 @@ class Interpreter implements Visitor
 
         $rightValue = $node->getRight()->accept($this);
 
+        return $this->performOperation($leftValue, $operator, $rightValue);
+    }
+
+    private function performOperation($leftValue, $operator, $rightValue)
+    {
         // Perform the right operation based on the operator
         switch ($operator) {
             case '+':
@@ -54,15 +63,18 @@ class Interpreter implements Visitor
                 return $leftValue * $rightValue;
 
             case '/':
-                if ($rightValue == 0)
+                if ($rightValue == 0) {
                     throw new Exception('Cannot divide by zero');
+                }
 
                 return $leftValue / $rightValue;
 
             default:
+                // This should not happen, as it's the Lexer's job to identify supported operators
                 throw new Exception('Unsupported operator: ' . $operator);
         }
     }
+
     public function visitNumberNode(NumberNode $node)
     {
         return intval($node->getValue());
@@ -74,6 +86,9 @@ class Interpreter implements Visitor
         $value = $node->getOperation()->accept($this);
 
         $this->context[$variableName] = $value;
+
+        //Assignment operators return the assigned value;
+        return $value;
     }
 
     public function visitVariableNode(VariableNode $node)

@@ -2,8 +2,8 @@
 
 class UnknownTokenException extends \Exception
 {
-    public function __construct($index)
+    public function __construct($line, $column)
     {
-        parent::__construct("Unknown token encountered at position $index");
+        parent::__construct("Unknown token encountered at position $line:$column");
     }
 }

@@ -27,7 +27,7 @@ class Lexer
                 $token = $this->findMatchingToken(substr($line, $column));
 
                 if (!$token)
-                    throw new UnknownTokenException($column);
+                    throw new UnknownTokenException($line, $column);
 
                 $token->setLine($lineNumber + 1);
                 $token->setColumn($column + 1);
