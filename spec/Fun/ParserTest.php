@@ -1,7 +1,7 @@
 <?php
 
-use Fun\Lexing\Token;
-use Fun\Lexing\TokenType;
+use Fun\Lexing\Tokens\Token;
+use Fun\Lexing\Tokens\TokenType;
 use Fun\Parsing\Parser;
 
 class ParserTest extends PHPUnit_Framework_TestCase

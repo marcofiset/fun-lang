@@ -1,4 +1,4 @@
-<?php namespace Fun\Lexing;
+<?php namespace Fun\Lexing\Tokens;
 
 final class TokenType
 {

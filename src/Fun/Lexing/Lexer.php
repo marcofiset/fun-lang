@@ -1,5 +1,8 @@
 <?php namespace Fun\Lexing;
 
+use Fun\Lexing\Tokens\Token;
+use Fun\Lexing\Tokens\TokenDefinition;
+
 class Lexer
 {
     /** @var TokenDefinition[]  */

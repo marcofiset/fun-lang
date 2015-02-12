@@ -1,5 +1,8 @@
 <?php namespace Fun\Lexing;
 
+use Fun\Lexing\Tokens\TokenDefinition;
+use Fun\Lexing\Tokens\TokenType;
+
 class FunLexer extends Lexer
 {
     public function __construct()

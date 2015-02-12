@@ -1,7 +1,7 @@
 <?php
 
-use Fun\Lexing\TokenDefinition;
-use Fun\Lexing\TokenType;
+use Fun\Lexing\Tokens\TokenDefinition;
+use Fun\Lexing\Tokens\TokenType;
 
 class TokenDefinitionTest extends PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,7 @@ class TokenDefinitionTest extends PHPUnit_Framework_TestCase
     {
         $token = $this->tokenDefinition->match('123');
 
-        $this->assertInstanceOf('Fun\Lexing\Token', $token);
+        $this->assertInstanceOf('Fun\Lexing\Tokens\Token', $token);
 
         $this->assertEquals('123', $token->getValue());
         $this->assertEquals(TokenType::Number, $token->getType());

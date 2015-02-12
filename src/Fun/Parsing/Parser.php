@@ -1,8 +1,8 @@
 <?php namespace Fun\Parsing;
 
 use Exception;
-use Fun\Lexing\Token;
-use Fun\Lexing\TokenType;
+use Fun\Lexing\Tokens\Token;
+use Fun\Lexing\Tokens\TokenType;
 use Fun\Parsing\Nodes\ExpressionListNode;
 use Fun\Parsing\Nodes\NumberNode;
 use Fun\Parsing\Nodes\OperationNode;
