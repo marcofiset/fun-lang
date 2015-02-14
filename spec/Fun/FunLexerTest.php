@@ -1,9 +1,9 @@
 <?php
 
+use Fun\Lexing\Exceptions\UnknownTokenException;
 use Fun\Lexing\FunLexer;
 use Fun\Lexing\Tokens\Token;
 use Fun\Lexing\Tokens\TokenType;
-use Fun\Lexing\UnknownTokenException;
 
 class FunLexerTest extends PHPUnit_Framework_TestCase
 {

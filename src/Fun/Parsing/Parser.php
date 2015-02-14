@@ -2,6 +2,7 @@
 
 use Exception;
 use Fun\Lexing\Tokens\Token;
+use Fun\Lexing\Tokens\TokenStream;
 use Fun\Lexing\Tokens\TokenType;
 use Fun\Parsing\Nodes\ExpressionListNode;
 use Fun\Parsing\Nodes\NumberNode;
@@ -11,8 +12,8 @@ use Fun\Parsing\Nodes\VariableNode;
 
 class Parser
 {
-    /** @var  Token[] */
-    private $tokens;
+    /** @var  TokenStream */
+    private $tokenStream;
 
     /**
      * @param Token[] $tokens
@@ -21,7 +22,7 @@ class Parser
     public function parse(array $tokens)
     {
         $tokens = $this->filterTokens($tokens);
-        $this->tokens = $tokens;
+        $this->tokenStream = new TokenStream($tokens);
 
         return $this->parseExpressionListNode();
     }
@@ -40,9 +41,9 @@ class Parser
     {
         $expressions = [];
 
-        while (!$this->isEmpty()) {
+        while (!$this->tokenStream->isEmpty()) {
             $expr = $this->parseExpressionNode();
-            $this->expectTokenType(TokenType::Terminator);
+            $this->tokenStream->expectTokenType(TokenType::Terminator);
 
             $expressions[] = $expr;
         }
@@ -53,7 +54,7 @@ class Parser
     // Expression = Assignment | Operation
     private function parseExpressionNode()
     {
-        $nextToken = $this->lookAhead();
+        $nextToken = $this->tokenStream->lookAhead();
 
         if ($nextToken->getType() === TokenType::AssignmentOperator)
             return $this->parseVariableAssignmentNode();
@@ -64,8 +65,8 @@ class Parser
     // Assignment = Identifier AssignmentOperator Operation
     private function parseVariableAssignmentNode()
     {
-        $identifier = $this->expectTokenType(TokenType::Identifier);
-        $this->expectTokenType(TokenType::AssignmentOperator);
+        $identifier = $this->tokenStream->expectTokenType(TokenType::Identifier);
+        $this->tokenStream->expectTokenType(TokenType::AssignmentOperator);
 
         $operation = $this->parseOperationNode();
 
@@ -76,12 +77,12 @@ class Parser
     private function parseOperationNode()
     {
         $left = $this->parseTerm();
-        $token = $this->currentToken();
+        $token = $this->tokenStream->currentToken();
 
         if ($token->getType() === TokenType::Terminator)
             return new OperationNode($left);
 
-        $operatorToken = $this->expectTokenType(TokenType::Operator);
+        $operatorToken = $this->tokenStream->expectTokenType(TokenType::Operator);
         $right = $this->parseTerm();
 
         return new OperationNode($left, $operatorToken->getValue(), $right);
@@ -90,7 +91,7 @@ class Parser
     // Term = Idenfitier | Number
     private function parseTerm()
     {
-        $currentToken = $this->consumeToken();
+        $currentToken = $this->tokenStream->consumeToken();
 
         switch ($currentToken->getType()) {
             case TokenType::Identifier:
@@ -102,56 +103,5 @@ class Parser
             default:
                 throw new Exception('Expected current token to be a Number or an Identifier.');
         }
-    }
-
-    /**
-     * @param $tokenType
-     * @return Token
-     * @throws Exception
-     */
-    private function expectTokenType($tokenType)
-    {
-        $peek = $this->currentToken();
-
-        if (!$peek)
-            throw new Exception('Unexpected end of stream');
-
-        if ($peek->getType() !== $tokenType)
-            throw new Exception('Unexpected token type.');
-
-        return $this->consumeToken();
-    }
-
-    /**
-     * @return Token
-     */
-    private function consumeToken()
-    {
-        return array_shift($this->tokens);
-    }
-
-    /**
-     * @return Token
-     */
-    private function currentToken()
-    {
-        return $this->lookAhead(0);
-    }
-
-    /**
-     * @param int $position
-     * @return Token
-     */
-    private function lookAhead($position = 1)
-    {
-        if ($position >= count($this->tokens))
-            return null;
-
-        return $this->tokens[$position];
-    }
-
-    private function isEmpty()
-    {
-        return count($this->tokens) === 0;
     }
 }
