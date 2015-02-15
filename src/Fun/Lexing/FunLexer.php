@@ -7,6 +7,7 @@ class FunLexer extends Lexer
 {
     public function __construct()
     {
+        $this->addTokenDefinition('/\n/', TokenType::NewLine);
         $this->addTokenDefinition('/\s+/', TokenType::Whitespace);
         $this->addTokenDefinition('/\d+/', TokenType::Number);
         $this->addTokenDefinition('/[+\-*\/]/', TokenType::Operator);

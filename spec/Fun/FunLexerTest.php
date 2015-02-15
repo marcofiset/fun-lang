@@ -45,13 +45,19 @@ class FunLexerTest extends PHPUnit_Framework_TestCase
 
     public function testCanTokenizeWhitespaces()
     {
-        $tokens = $this->lexer->tokenize('
-
-        ');
+        $tokens = $this->lexer->tokenize('        ');
 
         $token = $tokens[0];
         $this->assertEmpty(trim($token->getValue()));
         $this->assertEquals(TokenType::Whitespace, $token->getType());
+    }
+
+    public function testCanTokenizeNewLines()
+    {
+        $tokens = $this->lexer->tokenize('
+        ');
+
+        $this->assertEquals(TokenType::NewLine, $tokens[0]->getType());
     }
 
     public function testCanTokenizeIdentifiers()
@@ -90,7 +96,7 @@ class FunLexerTest extends PHPUnit_Framework_TestCase
     {
         $tokens = $this->lexer->tokenize("123\n456");
 
-        $this->assertTokenEquals("\n", TokenType::Whitespace, $tokens[1]);
+        $this->assertTokenEquals("\n", TokenType::NewLine, $tokens[1]);
     }
 
     public function testTokensHavePositionInformationMultiLine()
