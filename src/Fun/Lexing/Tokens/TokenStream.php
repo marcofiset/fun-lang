@@ -7,6 +7,9 @@ class TokenStream implements \Countable
     /** @var Token[] */
     private $tokens;
 
+    /** @var Token */
+    private $lastConsumedToken;
+
     public function __construct(array $tokens = [])
     {
         $this->tokens = $tokens;
@@ -45,16 +48,43 @@ class TokenStream implements \Countable
 
     public function consumeToken()
     {
-        return array_shift($this->tokens);
+        return $this->lastConsumedToken = array_shift($this->tokens);
     }
 
+    /**
+     * Expects the current token to be of a particular type.
+     *
+     * @param $type
+     * @return Token
+     * @throws UnexpectedTokenTypeException
+     */
     public function expectTokenType($type)
     {
         $token = $this->currentToken();
 
         if (!$token || $token->getType() !== $type)
-            throw new UnexpectedTokenTypeException($type, $token);
+            $this->throwUnexpectedTokenType($type, $token);
 
         return $this->consumeToken();
+    }
+
+    /**
+     * @param $type
+     * @param $token
+     * @throws UnexpectedTokenTypeException
+     */
+    private function throwUnexpectedTokenType($type, $token)
+    {
+        list($line, $column) = $this->getLineColumnInformation();
+
+        throw new UnexpectedTokenTypeException($type, $token, $line, $column);
+    }
+
+    private function getLineColumnInformation()
+    {
+        if (!$this->lastConsumedToken)
+            return [0, 0];
+
+        return [$this->lastConsumedToken->getLine(), $this->lastConsumedToken->getColumn()];
     }
 }

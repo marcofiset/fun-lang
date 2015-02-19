@@ -2,12 +2,12 @@
 
 use Fun\Lexing\Tokens\Token;
 
-class UnexpectedTokenTypeException extends \Exception
+class UnexpectedTokenTypeException extends FunException
 {
-    public function __construct($expectedType, Token $token = null)
+    public function __construct($expectedType, Token $token = null, $line, $column)
     {
         $message = $this->buildMessage($expectedType, $token);
-        parent::__construct($message);
+        parent::__construct($message, $line, $column);
     }
 
     private function buildMessage($type, $token)
