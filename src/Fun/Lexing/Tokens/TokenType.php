@@ -2,11 +2,11 @@
 
 final class TokenType
 {
-    const Number = 1;
-    const Operator = 2;
-    const Whitespace = 3;
-    const Identifier = 4;
-    const AssignmentOperator = 5;
-    const Terminator = 6;
-    const NewLine = 7;
+    const Number = "T_NUMBER";
+    const Operator = "T_OPERATOR";
+    const Whitespace = "T_WHITESPACE";
+    const Identifier = "T_IDENTIFIER";
+    const AssignmentOperator = "T_ASSIGNMENT_OPERATOR";
+    const Terminator = "T_TERMINATOR";
+    const NewLine = "T_NEWLINE";
 }
