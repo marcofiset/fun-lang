@@ -41,6 +41,20 @@ class ParserTest extends PHPUnit_Framework_TestCase
         $this->assertNumberNode($expr->getRight(), 5);
     }
 
+    public function testNodesHaveLineInformation()
+    {
+        $token = new Token('3', TokenType::Number);
+        $terminator = new Token(';', TokenType::Terminator);
+
+        $expressionListNode = $this->parse([$token, $terminator]);
+        $expressionNode = $expressionListNode->getExpressions()[0];
+        $numberNode = $expressionNode->getLeft();
+
+        $this->assertEquals(1, $expressionListNode->getPosition()->getLine());
+        $this->assertEquals(1, $expressionNode->getPosition()->getLine());
+        $this->assertEquals(1, $numberNode->getPosition()->getLine());
+    }
+
     private function parse($tokens)
     {
         $parser = new Parser();

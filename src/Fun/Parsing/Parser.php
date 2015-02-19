@@ -41,6 +41,8 @@ class Parser
     {
         $expressions = [];
 
+        $position = $this->tokenStream->currentTokenPosition();
+
         while (!$this->tokenStream->isEmpty()) {
             $expr = $this->parseExpressionNode();
             $this->tokenStream->expectTokenType(TokenType::Terminator);
@@ -48,7 +50,10 @@ class Parser
             $expressions[] = $expr;
         }
 
-        return new ExpressionListNode($expressions);
+        $expressionListNode = new ExpressionListNode($expressions);
+        $expressionListNode->setPosition($position);
+
+        return $expressionListNode;
     }
 
     // Expression = Assignment | Operation
@@ -56,7 +61,7 @@ class Parser
     {
         $nextToken = $this->tokenStream->lookAhead();
 
-        if ($nextToken->getType() === TokenType::AssignmentOperator)
+        if ($nextToken && $nextToken->getType() === TokenType::AssignmentOperator)
             return $this->parseVariableAssignmentNode();
 
         return $this->parseOperationNode();
