@@ -1,6 +1,6 @@
 <?php namespace Fun\Lexing\Tokens;
 
-use Fun\Lexing\Exceptions\UnexpectedTokenTypeException;
+use Fun\Exceptions\UnexpectedTokenTypeException;
 
 class TokenStream implements \Countable
 {

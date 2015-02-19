@@ -1,6 +1,6 @@
 <?php namespace Fun\Lexing;
 
-use Fun\Lexing\Exceptions\UnknownTokenException;
+use Fun\Exceptions\UnknownTokenException;
 use Fun\Lexing\Tokens\Token;
 use Fun\Lexing\Tokens\TokenDefinition;
 

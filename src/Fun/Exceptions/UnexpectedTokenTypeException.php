@@ -1,4 +1,4 @@
-<?php namespace Fun\Lexing\Exceptions;
+<?php namespace Fun\Exceptions;
 
 use Fun\Lexing\Tokens\Token;
 
