@@ -115,7 +115,9 @@ class FunLexerTest extends PHPUnit_Framework_TestCase
 
     private function assertTokenPosition(Token $token, $line, $column)
     {
-        $this->assertEquals($line, $token->getLine());
-        $this->assertEquals($column, $token->getColumn());
+        $position = $token->getPosition();
+
+        $this->assertEquals($line, $position->getLine());
+        $this->assertEquals($column, $position->getColumn());
     }
 }

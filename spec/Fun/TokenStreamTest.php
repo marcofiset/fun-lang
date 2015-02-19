@@ -94,4 +94,23 @@ class TokenStreamTest extends PHPUnit_Framework_TestCase
         $this->tokenStream->addToken(new Token('3', TokenType::Number));
         $this->tokenStream->expectTokenType(TokenType::Identifier);
     }
+
+    public function testLastConsumedToken()
+    {
+        $this->tokenStream->addToken(new Token('3', TokenType::Number));
+        $token = $this->tokenStream->consumeToken();
+
+        $this->assertEquals($token, $this->tokenStream->lastConsumedToken());
+    }
+
+    public function testCurrentTokenPosition()
+    {
+        $token = new Token('3', TokenType::Number);
+        $token->setPosition(1, 1);
+
+        $this->tokenStream->addToken($token);
+
+        $this->assertEquals(1, $this->tokenStream->currentTokenPosition()->getLine());
+        $this->assertEquals(1, $this->tokenStream->currentTokenPosition()->getColumn());
+    }
 }

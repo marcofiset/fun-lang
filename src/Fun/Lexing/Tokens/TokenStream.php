@@ -1,6 +1,7 @@
 <?php namespace Fun\Lexing\Tokens;
 
 use Fun\Exceptions\UnexpectedTokenTypeException;
+use Fun\PositionInformation;
 
 class TokenStream implements \Countable
 {
@@ -52,6 +53,16 @@ class TokenStream implements \Countable
     }
 
     /**
+     * Gets the last consumed token, or null if nothing has been consumed yet.
+     *
+     * @return Token
+     */
+    public function lastConsumedToken()
+    {
+        return $this->lastConsumedToken;
+    }
+
+    /**
      * Expects the current token to be of a particular type.
      *
      * @param $type
@@ -75,16 +86,19 @@ class TokenStream implements \Countable
      */
     private function throwUnexpectedTokenType($type, $token)
     {
-        list($line, $column) = $this->getLineColumnInformation();
-
-        throw new UnexpectedTokenTypeException($type, $token, $line, $column);
+        throw new UnexpectedTokenTypeException($type, $token, $this->currentTokenPosition());
     }
 
-    private function getLineColumnInformation()
+    /**
+     * Returns the position of the current token
+     *
+     * @return PositionInformation
+     */
+    public function currentTokenPosition()
     {
-        if (!$this->lastConsumedToken)
-            return [0, 0];
+        if ($this->isEmpty())
+            return new PositionInformation(0, 0);
 
-        return [$this->lastConsumedToken->getLine(), $this->lastConsumedToken->getColumn()];
+        return $this->currentToken()->getPosition();
     }
 }
