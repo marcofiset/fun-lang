@@ -13,6 +13,8 @@ class FunLexer extends Lexer
         $this->addTokenDefinition('/[_a-zA-Z][_a-zA-Z0-9]*/', TokenType::Identifier);
         $this->addTokenDefinition('/=/', TokenType::AssignmentOperator);
         $this->addTokenDefinition('/;/', TokenType::Terminator);
+        $this->addTokenDefinition('/==|!=|<=|>=|<|>/', TokenType::ConditionalOperator);
+        $this->addTokenDefinition('/\{|\}|\(|\)/', TokenType::Symbol);
     }
 
     private function addTokenDefinition($pattern, $type)

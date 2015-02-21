@@ -101,6 +101,39 @@ class FunLexerTest extends PHPUnit_Framework_TestCase
         $this->assertTokenPosition($tokens[2], 2, 1);
     }
 
+    public function testCanTokenizeConditionalOperators()
+    {
+        $tokens = $this->lexer->tokenize('== != < > <= >=');
+
+        $tokens = array_filter($tokens, function(Token $t) {
+            return $t->getType() !== TokenType::Whitespace;
+        });
+
+        $this->assertCount(6, $tokens);
+
+        foreach ($tokens as $t) {
+            $this->assertEquals(TokenType::ConditionalOperator, $t->getType());
+        }
+    }
+
+    public function testCanTokenizeSymbols()
+    {
+        $tokens = $this->lexer->tokenize('{}()');
+
+        // We expect 5 tokens, since a newline token is always added at the end
+        $this->assertCount(5, $tokens);
+
+        $this->assertEquals('{', $tokens[0]->getValue());
+        $this->assertEquals('}', $tokens[1]->getValue());
+        $this->assertEquals('(', $tokens[2]->getValue());
+        $this->assertEquals(')', $tokens[3]->getValue());
+
+        // Assert that the first 4 tokens are Symbols
+        foreach (array_slice($tokens, 0, 4) as $t) {
+            $this->assertEquals(TokenType::Symbol, $t->getType());
+        }
+    }
+
     private function assertTokenEquals($value, $type, Token $token)
     {
         $this->assertEquals($value, $token->getValue());
