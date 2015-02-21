@@ -1,6 +1,6 @@
 <?php namespace Fun\Lexing\Tokens;
 
-use Fun\Lexing\Exceptions\UnexpectedTokenTypeException;
+use Fun\Lexing\Exceptions\UnexpectedTokenException;
 
 class TokenStream implements \Countable
 {
@@ -43,17 +43,32 @@ class TokenStream implements \Countable
         return $this->tokens[$position];
     }
 
+    /**
+     * @return Token
+     */
     public function consumeToken()
     {
         return array_shift($this->tokens);
     }
 
-    public function expectTokenType($type)
+    public function expectTokenType($expectedType)
     {
         $token = $this->currentToken();
+        $actualType = $token ? $token->getType() : '';
 
-        if (!$token || $token->getType() !== $type)
-            throw new UnexpectedTokenTypeException($type, $token);
+        if ($expectedType !== $actualType)
+            throw new UnexpectedTokenException($expectedType, $actualType);
+
+        return $this->consumeToken();
+    }
+
+    public function expectTokenValue($expectedValue)
+    {
+        $token = $this->currentToken();
+        $actualValue = $token ? $token->getValue() : '';
+
+        if ($expectedValue !== $actualValue)
+            throw new UnexpectedTokenException($expectedValue, $actualValue);
 
         return $this->consumeToken();
     }

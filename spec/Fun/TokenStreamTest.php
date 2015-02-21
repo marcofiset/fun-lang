@@ -1,6 +1,6 @@
 <?php
 
-use Fun\Lexing\Exceptions\UnexpectedTokenTypeException;
+use Fun\Lexing\Exceptions\UnexpectedTokenException;
 use Fun\Lexing\Tokens\Token;
 use Fun\Lexing\Tokens\TokenStream;
 use Fun\Lexing\Tokens\TokenType;
@@ -89,7 +89,7 @@ class TokenStreamTest extends PHPUnit_Framework_TestCase
 
     public function testExpectTokenOfWrongTypeThrowsException()
     {
-        $this->setExpectedException(UnexpectedTokenTypeException::class);
+        $this->setExpectedException(UnexpectedTokenException::class);
 
         $this->tokenStream->addToken(new Token('3', TokenType::Number));
         $this->tokenStream->expectTokenType(TokenType::Identifier);

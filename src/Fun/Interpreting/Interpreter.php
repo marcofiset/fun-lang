@@ -2,7 +2,7 @@
 
 use Exception;
 use Fun\Interpreting\Visitors\Visitor;
-use Fun\Parsing\Nodes\ExpressionListNode;
+use Fun\Parsing\Nodes\InstructionListNode;
 use Fun\Parsing\Nodes\Node;
 use Fun\Parsing\Nodes\OperationNode;
 use Fun\Parsing\Nodes\NumberNode;
@@ -24,11 +24,11 @@ class Interpreter implements Visitor
         return $rootNode->accept($this);
     }
 
-    public function visitExpressionListNode(ExpressionListNode $node)
+    public function visitInstructionListNode(InstructionListNode $node)
     {
         $result = null;
 
-        foreach ($node->getExpressions() as $expr) {
+        foreach ($node->getInstructions() as $expr) {
             $result = $expr->accept($this);
         }
 
