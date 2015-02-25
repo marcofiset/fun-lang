@@ -9,4 +9,6 @@ final class TokenType
     const AssignmentOperator = 5;
     const Terminator = 6;
     const NewLine = 7;
+    const ConditionalOperator = 8;
+    const Symbol = 9;
 }

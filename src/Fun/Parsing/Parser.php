@@ -4,11 +4,15 @@ use Exception;
 use Fun\Lexing\Tokens\Token;
 use Fun\Lexing\Tokens\TokenStream;
 use Fun\Lexing\Tokens\TokenType;
-use Fun\Parsing\Nodes\ExpressionListNode;
+use Fun\Parsing\Nodes\BlockNode;
+use Fun\Parsing\Nodes\ConditionalExpressionNode;
+use Fun\Parsing\Nodes\IfStatementNode;
+use Fun\Parsing\Nodes\InstructionListNode;
 use Fun\Parsing\Nodes\NumberNode;
 use Fun\Parsing\Nodes\OperationNode;
 use Fun\Parsing\Nodes\VariableAssignmentNode;
 use Fun\Parsing\Nodes\VariableNode;
+use Fun\Parsing\Nodes\WhileStatementNode;
 
 class Parser
 {
@@ -17,14 +21,16 @@ class Parser
 
     /**
      * @param Token[] $tokens
-     * @return ExpressionListNode The root node of the parsed AST
+     * @return InstructionListNode The root node of the parsed AST
      */
     public function parse(array $tokens)
     {
         $tokens = $this->filterTokens($tokens);
         $this->tokenStream = new TokenStream($tokens);
 
-        return $this->parseExpressionListNode();
+        return $this->parseInstructionListNode(function() {
+            return $this->tokenStream->isEmpty();
+        });
     }
 
     private function filterTokens(array $tokens)
@@ -36,19 +42,97 @@ class Parser
         return array_values($filteredTokens);
     }
 
-    // ExpressionList = (Expression Terminator)+
-    private function parseExpressionListNode()
+    // InstructionList = (Instruction)+
+    private function parseInstructionListNode(callable $terminationCondition)
     {
-        $expressions = [];
+        $instructions = [];
 
-        while (!$this->tokenStream->isEmpty()) {
-            $expr = $this->parseExpressionNode();
-            $this->tokenStream->expectTokenType(TokenType::Terminator);
-
-            $expressions[] = $expr;
+        while (!$terminationCondition()) {
+            $instr = $this->parseInstruction();
+            $instructions[] = $instr;
         }
 
-        return new ExpressionListNode($expressions);
+        return new InstructionListNode($instructions);
+    }
+
+    // Instruction = (Expression Terminator) | Statement
+    private function parseInstruction()
+    {
+        $currentTokenValue = $this->tokenStream->currentToken()->getValue();
+
+        if (in_array($currentTokenValue, ['if', 'while']))
+            return $this->parseStatement();
+
+        $expr = $this->parseExpressionNode();
+        $this->tokenStream->expectTokenType(TokenType::Terminator);
+
+        return $expr;
+    }
+
+    // Statement = IfStatement | WhileStatement
+    private function parseStatement()
+    {
+        $token = $this->tokenStream->currentToken();
+
+        switch ($token->getValue()) {
+            case 'if':
+                return $this->parseIfStatement();
+
+            case 'while':
+                return $this->parseWhileStatement();
+
+            default:
+                throw new Exception('Expected if or while');
+        }
+    }
+
+    private function parseIfStatement()
+    {
+        return $this->parseConditionalStatementNode('if', IfStatementNode::class);
+    }
+
+    private function parseWhileStatement()
+    {
+        return $this->parseConditionalStatementNode('while', WhileStatementNode::class);
+    }
+
+    private function parseConditionalStatementNode($keyword, $nodeClass)
+    {
+        $this->tokenStream->expectTokenValue($keyword);
+        $this->tokenStream->expectTokenValue('(');
+
+        $condition = $this->parseConditionalExpressionNode();
+
+        $this->tokenStream->expectTokenValue(')');
+
+        $body = $this->parseBlockNode();
+
+        return new $nodeClass($condition, $body);
+    }
+
+    private function parseConditionalExpressionNode()
+    {
+        $leftNode = $this->parseExpressionNode();
+        $operator = $this->tokenStream->expectTokenType(TokenType::ConditionalOperator);
+        $rightNode = $this->parseExpressionNode();
+
+        return new ConditionalExpressionNode($leftNode, $operator->getValue(), $rightNode);
+    }
+
+    private function parseBlockNode()
+    {
+        $this->tokenStream->expectTokenValue('{');
+
+        $instructions = $this->parseInstructionListNode(function() {
+            $currentToken = $this->tokenStream->currentToken();
+
+            // Stop parsing instructions once we get to the closing brace
+            return $currentToken && $currentToken->getValue() === '}';
+        });
+
+        $this->tokenStream->expectTokenValue('}');
+
+        return new BlockNode($instructions);
     }
 
     // Expression = Assignment | Operation
@@ -79,7 +163,7 @@ class Parser
         $left = $this->parseTerm();
         $token = $this->tokenStream->currentToken();
 
-        if ($token->getType() === TokenType::Terminator)
+        if ($token->getType() !== TokenType::Operator)
             return new OperationNode($left);
 
         $operatorToken = $this->tokenStream->expectTokenType(TokenType::Operator);
