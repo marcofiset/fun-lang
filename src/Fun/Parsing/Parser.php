@@ -4,6 +4,7 @@ use Exception;
 use Fun\Lexing\Tokens\Token;
 use Fun\Lexing\Tokens\TokenStream;
 use Fun\Lexing\Tokens\TokenType;
+use Fun\Parsing\Nodes\BlockNode;
 use Fun\Parsing\Nodes\ConditionalExpressionNode;
 use Fun\Parsing\Nodes\IfStatementNode;
 use Fun\Parsing\Nodes\InstructionListNode;
@@ -27,7 +28,9 @@ class Parser
         $tokens = $this->filterTokens($tokens);
         $this->tokenStream = new TokenStream($tokens);
 
-        return $this->parseInstructionListNode();
+        return $this->parseInstructionListNode(function() {
+            return $this->tokenStream->isEmpty();
+        });
     }
 
     private function filterTokens(array $tokens)
@@ -40,11 +43,11 @@ class Parser
     }
 
     // InstructionList = (Instruction)+
-    private function parseInstructionListNode()
+    private function parseInstructionListNode(callable $terminationCondition)
     {
         $instructions = [];
 
-        while (!$this->tokenStream->isEmpty()) {
+        while (!$terminationCondition()) {
             $instr = $this->parseInstruction();
             $instructions[] = $instr;
         }
@@ -110,7 +113,7 @@ class Parser
     private function parseConditionalExpressionNode()
     {
         $leftNode = $this->parseExpressionNode();
-        $operator = $this->tokenStream->expectTokenValue(TokenType::ConditionalOperator);
+        $operator = $this->tokenStream->expectTokenType(TokenType::ConditionalOperator);
         $rightNode = $this->parseExpressionNode();
 
         return new ConditionalExpressionNode($leftNode, $operator, $rightNode);
@@ -118,7 +121,18 @@ class Parser
 
     private function parseBlockNode()
     {
-        // parse block node
+        $this->tokenStream->expectTokenValue('{');
+
+        $instructions = $this->parseInstructionListNode(function() {
+            $currentToken = $this->tokenStream->currentToken();
+
+            // Stop parsing instructions once we get to the closing brace
+            return $currentToken && $currentToken->getValue() === '}';
+        });
+
+        $this->tokenStream->expectTokenValue('}');
+
+        return new BlockNode($instructions);
     }
 
     // Expression = Assignment | Operation
