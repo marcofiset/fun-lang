@@ -116,7 +116,7 @@ class Parser
         $operator = $this->tokenStream->expectTokenType(TokenType::ConditionalOperator);
         $rightNode = $this->parseExpressionNode();
 
-        return new ConditionalExpressionNode($leftNode, $operator, $rightNode);
+        return new ConditionalExpressionNode($leftNode, $operator->getValue(), $rightNode);
     }
 
     private function parseBlockNode()
@@ -163,7 +163,7 @@ class Parser
         $left = $this->parseTerm();
         $token = $this->tokenStream->currentToken();
 
-        if ($token->getType() === TokenType::Terminator)
+        if ($token->getType() !== TokenType::Operator)
             return new OperationNode($left);
 
         $operatorToken = $this->tokenStream->expectTokenType(TokenType::Operator);

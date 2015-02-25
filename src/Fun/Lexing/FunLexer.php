@@ -9,7 +9,7 @@ class FunLexer extends Lexer
     {
         $this->addTokenDefinition('/\s+/', TokenType::Whitespace);
         $this->addTokenDefinition('/\d+/', TokenType::Number);
-        $this->addTokenDefinition('/[+\-*\/]/', TokenType::Operator);
+        $this->addTokenDefinition('/[+\-*\/%]/', TokenType::Operator);
         $this->addTokenDefinition('/[_a-zA-Z][_a-zA-Z0-9]*/', TokenType::Identifier);
         $this->addTokenDefinition('/=/', TokenType::AssignmentOperator);
         $this->addTokenDefinition('/;/', TokenType::Terminator);
