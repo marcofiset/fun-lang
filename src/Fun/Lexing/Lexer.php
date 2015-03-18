@@ -66,14 +66,21 @@ class Lexer
      */
     private function findMatchingToken($input)
     {
+        $matchedTokens = [];
+
         foreach ($this->tokenDefinitions as $tokenDefinition) {
             $token = $tokenDefinition->match($input);
 
             if ($token)
-                return $token;
+                $matchedTokens[] = $token;
         }
 
         // Return null if no tokens were matched.
-        return null;
+        if (empty($matchedTokens))
+            return null;
+
+        return array_max($matchedTokens, function (Token $t) {
+            return strlen($t->getValue());
+        });
     }
 }

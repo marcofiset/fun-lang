@@ -1,6 +1,6 @@
 <?php namespace Fun\Lexing\Tokens;
 
-use Fun\Exceptions\UnexpectedTokenTypeException;
+use Fun\Lexing\Exceptions\UnexpectedTokenException;
 use Fun\PositionInformation;
 
 class TokenStream implements \Countable
@@ -47,6 +47,9 @@ class TokenStream implements \Countable
         return $this->tokens[$position];
     }
 
+    /**
+     * @return Token
+     */
     public function consumeToken()
     {
         return $this->lastConsumedToken = array_shift($this->tokens);
@@ -65,28 +68,37 @@ class TokenStream implements \Countable
     /**
      * Expects the current token to be of a particular type.
      *
-     * @param $type
+     * @param $expectedType
      * @return Token
-     * @throws UnexpectedTokenTypeException
+     * @throws UnexpectedTokenException
      */
-    public function expectTokenType($type)
+    public function expectTokenType($expectedType)
     {
         $token = $this->currentToken();
+        $actualType = $token ? $token->getType() : '';
 
-        if (!$token || $token->getType() !== $type)
-            $this->throwUnexpectedTokenType($type, $token);
+        if (!$token || $actualType !== $expectedType)
+            throw new UnexpectedTokenException($expectedType, $actualType);
 
         return $this->consumeToken();
     }
 
     /**
-     * @param $type
-     * @param $token
-     * @throws UnexpectedTokenTypeException
+     * Expects the current token to be of a specific value.
+     *
+     * @param $expectedValue
+     * @return Token
+     * @throws UnexpectedTokenException
      */
-    private function throwUnexpectedTokenType($type, $token)
+    public function expectTokenValue($expectedValue)
     {
-        throw new UnexpectedTokenTypeException($type, $token, $this->currentTokenPosition());
+        $token = $this->currentToken();
+        $actualValue = $token ? $token->getValue() : '';
+
+        if ($expectedValue !== $actualValue)
+            throw new UnexpectedTokenException($expectedValue, $actualValue);
+
+        return $this->consumeToken();
     }
 
     /**

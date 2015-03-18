@@ -15,9 +15,9 @@ class ParserTest extends PHPUnit_Framework_TestCase
 
         $node = $this->parse($tokens);
 
-        $this->assertInstanceOf('Fun\Parsing\Nodes\ExpressionListNode', $node);
+        $this->assertInstanceOf('Fun\Parsing\Nodes\InstructionListNode', $node);
 
-        $expr = $node->getExpressions()[0];
+        $expr = $node->getInstructions()[0];
         $this->assertNumberNode($expr->getLeft(), 3);
     }
 
@@ -32,9 +32,9 @@ class ParserTest extends PHPUnit_Framework_TestCase
 
         $node = $this->parse($tokens);
 
-        $this->assertInstanceOf('Fun\Parsing\Nodes\ExpressionListNode', $node);
+        $this->assertInstanceOf('Fun\Parsing\Nodes\InstructionListNode', $node);
 
-        $expr = $node->getExpressions()[0];
+        $expr = $node->getInstructions()[0];
 
         $this->assertNumberNode($expr->getLeft(), 3);
         $this->assertEquals('+', $expr->getOperator());
@@ -46,11 +46,11 @@ class ParserTest extends PHPUnit_Framework_TestCase
         $token = new Token('3', TokenType::Number);
         $terminator = new Token(';', TokenType::Terminator);
 
-        $expressionListNode = $this->parse([$token, $terminator]);
-        $expressionNode = $expressionListNode->getExpressions()[0];
+        $instructionListNode = $this->parse([$token, $terminator]);
+        $expressionNode = $instructionListNode->getInstructions()[0];
         $numberNode = $expressionNode->getLeft();
 
-        $this->assertEquals(1, $expressionListNode->getPosition()->getLine());
+        $this->assertEquals(1, $instructionListNode->getPosition()->getLine());
         $this->assertEquals(1, $expressionNode->getPosition()->getLine());
         $this->assertEquals(1, $numberNode->getPosition()->getLine());
     }

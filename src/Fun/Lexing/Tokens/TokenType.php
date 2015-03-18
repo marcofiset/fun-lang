@@ -9,4 +9,6 @@ final class TokenType
     const AssignmentOperator = "T_ASSIGNMENT_OPERATOR";
     const Terminator = "T_TERMINATOR";
     const NewLine = "T_NEWLINE";
+    const ConditionalOperator = "T_CONDITIONAL_OPERATOR";
+    const Symbol = "T_SYMBOL";
 }

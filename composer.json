@@ -4,6 +4,9 @@
     },
 
     "autoload": {
-        "psr-4": {"Fun\\": "src/Fun/"}
+        "psr-4": {"Fun\\": "src/Fun/"},
+        "files": [
+            "src/Fun/utils.php"
+        ]
     }
 }

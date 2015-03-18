@@ -2,12 +2,16 @@
 
 use Exception;
 use Fun\Interpreting\Visitors\Visitor;
-use Fun\Parsing\Nodes\ExpressionListNode;
+use Fun\Parsing\Nodes\BlockNode;
+use Fun\Parsing\Nodes\ConditionalExpressionNode;
+use Fun\Parsing\Nodes\ConditionalStatementNode;
+use Fun\Parsing\Nodes\InstructionListNode;
 use Fun\Parsing\Nodes\Node;
 use Fun\Parsing\Nodes\OperationNode;
 use Fun\Parsing\Nodes\NumberNode;
 use Fun\Parsing\Nodes\VariableAssignmentNode;
 use Fun\Parsing\Nodes\VariableNode;
+use Fun\Parsing\Nodes\WhileStatementNode;
 
 class Interpreter implements Visitor
 {
@@ -24,11 +28,11 @@ class Interpreter implements Visitor
         return $rootNode->accept($this);
     }
 
-    public function visitExpressionListNode(ExpressionListNode $node)
+    public function visitInstructionListNode(InstructionListNode $node)
     {
         $result = null;
 
-        foreach ($node->getExpressions() as $expr) {
+        foreach ($node->getInstructions() as $expr) {
             $result = $expr->accept($this);
         }
 
@@ -63,11 +67,13 @@ class Interpreter implements Visitor
                 return $leftValue * $rightValue;
 
             case '/':
-                if ($rightValue == 0) {
+                if ($rightValue == 0)
                     throw new Exception('Cannot divide by zero');
-                }
 
                 return $leftValue / $rightValue;
+
+            case '%':
+                return $leftValue % $rightValue;
 
             default:
                 // This should not happen, as it's the Lexer's job to identify supported operators
@@ -99,5 +105,63 @@ class Interpreter implements Visitor
             throw new Exception('Undefined variable: ' . $variableName);
 
         return $this->context[$variableName];
+    }
+
+    public function visitConditionalExpressionNode(ConditionalExpressionNode $node)
+    {
+        $leftValue = $node->getLeftNode()->accept($this);
+        $rightValue = $node->getRightNode()->accept($this);
+
+        switch ($node->getConditionalOperator()) {
+            case '==':
+                return $leftValue === $rightValue;
+
+            case '!=':
+                return $leftValue !== $rightValue;
+
+            case '<=':
+                return $leftValue <= $rightValue;
+
+            case '>=':
+                return $leftValue >= $rightValue;
+
+            case '<';
+                return $leftValue < $rightValue;
+
+            case '>';
+                return $leftValue > $rightValue;
+
+            default:
+                // This should not happen, it should instead fail in the Lexer first.
+                throw new Exception('Unsupported conditional operator: ' . $node->getConditionalOperator());
+        }
+    }
+
+    public function visitIfStatementNode(ConditionalStatementNode $node)
+    {
+        $conditionValue = $node->getCondition()->accept($this);
+
+        if ($conditionValue)
+            return $node->getBody()->accept($this);
+
+        return null;
+    }
+
+    public function visitWhileStatementNode(WhileStatementNode $node)
+    {
+        $result = null;
+
+        $condition = $node->getCondition();
+        $body = $node->getBody();
+
+        while ($condition->accept($this))
+            $result = $body->accept($this);
+
+        return $result;
+    }
+
+    public function visitBlockNode(BlockNode $node)
+    {
+        return $node->getInstructionListNode()->accept($this);
     }
 }
