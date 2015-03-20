@@ -1,7 +1,7 @@
 <?php namespace Fun\Lexing\Tokens;
 
 use Fun\Lexing\Exceptions\UnexpectedTokenException;
-use Fun\PositionInformation;
+use Fun\Position;
 
 class TokenStream implements \Countable
 {
@@ -104,12 +104,12 @@ class TokenStream implements \Countable
     /**
      * Returns the position of the current token
      *
-     * @return PositionInformation
+     * @return Position
      */
     public function currentTokenPosition()
     {
         if ($this->isEmpty())
-            return new PositionInformation(0, 0);
+            return new Position(0, 0);
 
         return $this->currentToken()->getPosition();
     }

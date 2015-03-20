@@ -3,7 +3,7 @@
 use Fun\Exceptions\UnknownTokenException;
 use Fun\Lexing\Tokens\Token;
 use Fun\Lexing\Tokens\TokenDefinition;
-use Fun\PositionInformation;
+use Fun\Position;
 
 class Lexer
 {
@@ -32,7 +32,7 @@ class Lexer
                 $token = $this->findMatchingToken(substr($line, $column));
 
                 if (!$token)
-                    throw new UnknownTokenException(new PositionInformation($lineNumber + 1, $column + 1));
+                    throw new UnknownTokenException(new Position($lineNumber + 1, $column + 1));
 
                 // Lines and columns start at 1 in the source file, but here they are 0-based.
                 // That's why we add 1 to them to set the position

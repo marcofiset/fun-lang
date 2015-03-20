@@ -1,6 +1,6 @@
 <?php namespace Fun;
 
-class PositionInformation
+class Position
 {
     private $line;
     private $column;

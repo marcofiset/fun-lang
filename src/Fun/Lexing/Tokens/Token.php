@@ -1,13 +1,13 @@
 <?php namespace Fun\Lexing\Tokens;
 
-use Fun\PositionInformation;
+use Fun\Position;
 
 class Token
 {
     private $value;
     private $type;
 
-    /** @var PositionInformation */
+    /** @var Position */
     private $position;
 
     public function __construct($value, $type)
@@ -29,11 +29,11 @@ class Token
     /**
      * The position of the token in the source file
      *
-     * @return PositionInformation
+     * @return Position
      */
     public function getPosition()
     {
-        return $this->position ?: new PositionInformation(0, 0);
+        return $this->position ?: new Position(0, 0);
     }
 
     /**
@@ -44,6 +44,6 @@ class Token
      */
     public function setPosition($line, $column)
     {
-        $this->position = new PositionInformation($line, $column);
+        $this->position = new Position($line, $column);
     }
 }
