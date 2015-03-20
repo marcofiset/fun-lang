@@ -1,6 +1,6 @@
 <?php
 
-use Fun\Lexing\Exceptions\UnexpectedTokenException;
+use Fun\Exceptions\UnexpectedTokenException;
 use Fun\Lexing\Tokens\Token;
 use Fun\Lexing\Tokens\TokenStream;
 use Fun\Lexing\Tokens\TokenType;

@@ -1,11 +1,13 @@
-<?php namespace Fun\Lexing\Exceptions;
+<?php namespace Fun\Exceptions;
 
-class UnexpectedTokenException extends \Exception
+use Fun\Position;
+
+class UnexpectedTokenException extends FunException
 {
-    public function __construct($expected, $actual)
+    public function __construct($expected, $actual, Position $position)
     {
         $message = $this->buildMessage($expected, $actual);
-        parent::__construct($message);
+        parent::__construct($message, $position);
     }
 
     private function buildMessage($expected, $actual)

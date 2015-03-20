@@ -1,6 +1,6 @@
 <?php namespace Fun\Lexing\Tokens;
 
-use Fun\Lexing\Exceptions\UnexpectedTokenException;
+use Fun\Exceptions\UnexpectedTokenException;
 use Fun\Position;
 
 class TokenStream implements \Countable
@@ -14,6 +14,9 @@ class TokenStream implements \Countable
     public function __construct(array $tokens = [])
     {
         $this->tokens = $tokens;
+
+        // Initialize lastConsumedToken to a dummy token so we don't have to check for null
+        $this->lastConsumedToken = new Token('', '');
     }
 
     public function addToken($token)
@@ -77,10 +80,7 @@ class TokenStream implements \Countable
         $token = $this->currentToken();
         $actualType = $token ? $token->getType() : '';
 
-        if (!$token || $actualType !== $expectedType)
-            throw new UnexpectedTokenException($expectedType, $actualType);
-
-        return $this->consumeToken();
+        return $this->consumeExpectedTokenOrThrow($expectedType, $actualType);
     }
 
     /**
@@ -95,8 +95,20 @@ class TokenStream implements \Countable
         $token = $this->currentToken();
         $actualValue = $token ? $token->getValue() : '';
 
-        if ($expectedValue !== $actualValue)
-            throw new UnexpectedTokenException($expectedValue, $actualValue);
+        return $this->consumeExpectedTokenOrThrow($expectedValue, $actualValue);
+    }
+
+    /**
+     * @param $expected
+     * @param $actual
+     * @return Token
+     * @throws UnexpectedTokenException
+     */
+    private function consumeExpectedTokenOrThrow($expected, $actual)
+    {
+        if ($expected !== $actual) {
+            throw new UnexpectedTokenException($expected, $actual, $this->currentTokenPosition());
+        }
 
         return $this->consumeToken();
     }
